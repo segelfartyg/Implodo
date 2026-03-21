@@ -10,11 +10,12 @@ import (
 	"io"
 	"net/http"
 
+	"implodo_backend/config"
+	"implodo_backend/store"
+
 	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
-	"implodo_backend/config"
-	"implodo_backend/store"
 )
 
 // Handler holds dependencies for all auth-related HTTP handlers.
@@ -71,7 +72,7 @@ type TokenResponse struct {
 
 // googleUserInfo is the relevant subset of the response from Google's userinfo endpoint.
 type googleUserInfo struct {
-	Sub   string `json:"sub"`   // Stable Google user ID — this is what we check against AllowedGoogleIDs
+	Sub   string `json:"sub"` // Stable Google user ID — this is what we check against AllowedGoogleIDs
 	Email string `json:"email"`
 	Name  string `json:"name"`
 }
@@ -134,6 +135,7 @@ func (h *Handler) GoogleCallback(c *gin.Context) {
 
 	// Check whether this Google user is allowed.
 	if !h.isAllowed(userInfo.Sub) {
+		fmt.Println(userInfo.Sub)
 		c.JSON(http.StatusForbidden, gin.H{"error": "account not authorized"})
 		return
 	}

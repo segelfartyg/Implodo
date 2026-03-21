@@ -1,18 +1,41 @@
 package main
 
 import (
+	"context"
 	"log"
 
-	"github.com/gin-gonic/gin"
 	"implodo_backend/auth"
 	"implodo_backend/config"
+	"implodo_backend/imagegen"
+	"implodo_backend/imagestorage"
 	"implodo_backend/store"
+	"implodo_backend/upload"
+
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	if err := godotenv.Load("local.env"); err != nil {
+		log.Println("No local.env file found, using environment variables")
+	}
 	cfg := config.Load()
+
+	ctx := context.Background()
+
+	genClient, err := imagegen.NewGeminiClient(ctx)
+	if err != nil {
+		log.Fatalf("Failed to create Gemini client: %v", err)
+	}
+
+	storageClient, err := imagestorage.NewGCSClient(ctx, cfg.BucketName)
+	if err != nil {
+		log.Fatalf("Failed to create GCS client: %v", err)
+	}
+
 	sessions := store.NewSessionStore()
 	authHandler := auth.NewHandler(cfg, sessions)
+	uploadHandler := upload.NewHandler(genClient, storageClient)
 
 	r := gin.Default()
 
@@ -33,6 +56,8 @@ func main() {
 	api.Use(auth.JWTMiddleware(cfg))
 	{
 		api.GET("/me", authHandler.Me)
+		api.POST("/upload", uploadHandler.UploadImage)
+		api.GET("/images", uploadHandler.ListImages)
 	}
 
 	log.Printf("Server listening on :%s", cfg.Port)

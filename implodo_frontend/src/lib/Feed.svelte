@@ -1,84 +1,46 @@
 <script>
-  import { onDestroy } from 'svelte';
-  import { fetchPosts } from './api.js';
+  import { fetchImages } from './api.js';
   import PostCard from './PostCard.svelte';
 
-  let posts = [];
-  let page = 1;
-  let hasMore = true;
-  let loading = false;
-  let error = null;
+  let images = $state([]);
+  let loading = $state(true);
+  let error = $state('');
 
-  // Sentinel element watched by IntersectionObserver.
-  let sentinel;
-
-  async function loadMore() {
-    if (loading || !hasMore) return;
+  async function load() {
     loading = true;
-    error = null;
+    error = '';
     try {
-      const result = await fetchPosts(page);
-      posts = [...posts, ...result.posts];
-      hasMore = result.hasMore;
-      page = result.nextPage;
+      images = await fetchImages();
     } catch (e) {
-      error = 'Failed to load posts. Tap to retry.';
+      error = e.message;
     } finally {
       loading = false;
     }
   }
 
-  // Kick off the first load immediately.
-  loadMore();
-
-  // Set up IntersectionObserver once the sentinel is in the DOM.
-  let observer;
-  $: if (sentinel) {
-    observer?.disconnect();
-    observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) loadMore();
-      },
-      { rootMargin: '300px' }
-    );
-    observer.observe(sentinel);
-  }
-
-  onDestroy(() => observer?.disconnect());
+  load();
 </script>
 
 <section class="feed">
-  <div class="grid">
-    {#each posts as post (post.id)}
-      <PostCard {post} />
-    {/each}
-  </div>
-
-  <!-- Loading skeleton cards -->
   {#if loading}
-    <div class="grid skeleton-grid">
-      {#each Array(6) as _}
+    <div class="grid">
+      {#each Array(3) as _}
         <div class="skeleton-card">
           <div class="skeleton-img"></div>
-          <div class="skeleton-footer">
-            <div class="skeleton-line short"></div>
-            <div class="skeleton-line tiny"></div>
-          </div>
         </div>
       {/each}
     </div>
+  {:else if error}
+    <button class="retry-btn" onclick={load}>{error} — tap to retry</button>
+  {:else if images.length === 0}
+    <p class="empty-msg">No posts yet. Upload an image above to get started.</p>
+  {:else}
+    <div class="grid">
+      {#each images as image (image.id)}
+        <PostCard {image} />
+      {/each}
+    </div>
   {/if}
-
-  {#if error}
-    <button class="retry-btn" on:click={loadMore}>{error}</button>
-  {/if}
-
-  {#if !hasMore && posts.length > 0}
-    <p class="end-msg">You've seen everything ✓</p>
-  {/if}
-
-  <!-- Invisible sentinel that triggers the next page load -->
-  <div bind:this={sentinel} class="sentinel" aria-hidden="true"></div>
 </section>
 
 <style>
@@ -97,11 +59,6 @@
     margin: 0 auto;
   }
 
-  /* --- Skeleton --- */
-  .skeleton-grid {
-    margin-top: 0;
-  }
-
   .skeleton-card {
     background: var(--surface);
     border-radius: 12px;
@@ -116,30 +73,12 @@
     animation: shimmer 1.4s infinite;
   }
 
-  .skeleton-footer {
-    padding: 10px 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .skeleton-line {
-    height: 10px;
-    border-radius: 4px;
-    background: var(--skeleton-base);
-    animation: shimmer 1.4s infinite;
-  }
-
-  .skeleton-line.short { width: 55%; }
-  .skeleton-line.tiny  { width: 28%; }
-
   @keyframes shimmer {
     0%   { opacity: 0.5; }
     50%  { opacity: 1; }
     100% { opacity: 0.5; }
   }
 
-  /* --- Misc --- */
   .retry-btn {
     display: block;
     margin: 24px auto;
@@ -154,14 +93,10 @@
 
   .retry-btn:hover { background: var(--border); }
 
-  .end-msg {
+  .empty-msg {
     text-align: center;
     color: var(--text-muted);
-    font-size: 0.85rem;
-    padding: 32px 0;
-  }
-
-  .sentinel {
-    height: 1px;
+    font-size: 0.875rem;
+    padding: 48px 0;
   }
 </style>

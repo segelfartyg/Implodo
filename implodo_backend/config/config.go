@@ -1,6 +1,11 @@
 package config
 
-import "time"
+import (
+	"os"
+	"strconv"
+	"strings"
+	"time"
+)
 
 type Config struct {
 	// Google OAuth2 credentials — create these at https://console.cloud.google.com/
@@ -27,24 +32,37 @@ type Config struct {
 	// e.g. "myapp://auth/complete" — the app intercepts this and knows to call /auth/token
 	AppDeepLinkURI string
 
-	Port string
+	Port       string
+	BucketName string
 }
 
 func Load() *Config {
-	return &Config{
-		GoogleClientID:     "PLACEHOLDER_GOOGLE_CLIENT_ID.apps.googleusercontent.com",
-		GoogleClientSecret: "PLACEHOLDER_GOOGLE_CLIENT_SECRET",
-		GoogleRedirectURL:  "http://localhost:8080/auth/google/callback",
+	hours, _ := strconv.Atoi(getEnv("JWT_DURATION_HOURS", "24"))
 
-		AllowedGoogleIDs: []string{
-			"PLACEHOLDER_GOOGLE_USER_ID", // the "sub" field from Google — a numeric string like "1234567890"
-		},
-
-		JWTSecret:   "PLACEHOLDER_JWT_SECRET_REPLACE_WITH_32_PLUS_RANDOM_CHARS",
-		JWTDuration: 24 * time.Hour,
-
-		AppDeepLinkURI: "implodo://auth/complete",
-
-		Port: "8080",
+	rawIDs := getEnv("ALLOWED_GOOGLE_IDS", "")
+	var allowedIDs []string
+	for _, id := range strings.Split(rawIDs, ",") {
+		if id = strings.TrimSpace(id); id != "" {
+			allowedIDs = append(allowedIDs, id)
+		}
 	}
+
+	return &Config{
+		GoogleClientID:     getEnv("GOOGLE_CLIENT_ID", ""),
+		GoogleClientSecret: getEnv("GOOGLE_CLIENT_SECRET", ""),
+		GoogleRedirectURL:  getEnv("GOOGLE_REDIRECT_URL", "http://localhost:8080/auth/google/callback"),
+		AllowedGoogleIDs:   allowedIDs,
+		JWTSecret:          getEnv("JWT_SECRET", ""),
+		JWTDuration:        time.Duration(hours) * time.Hour,
+		AppDeepLinkURI:     getEnv("APP_DEEP_LINK_URI", "implodo://auth/complete"),
+		Port:               getEnv("PORT", "8080"),
+		BucketName:         getEnv("BUCKET_NAME", ""),
+	}
+}
+
+func getEnv(key, fallback string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return fallback
 }
