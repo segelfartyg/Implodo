@@ -2,8 +2,8 @@
   import { getToken } from './auth.js';
   import ImageCompare from './ImageCompare.svelte';
 
-  /** @type {{ onUploaded?: () => void }} */
-  let { onUploaded } = $props();
+  /** @type {{ onUploaded?: () => void, onBack?: () => void }} */
+  let { onUploaded, onBack } = $props();
 
   let file = $state(null);
   let preview = $state('');
@@ -80,15 +80,12 @@
 </script>
 
 <div class="upload-card">
+  {#if onBack}
+    <button class="back-btn" onclick={onBack}>← Back</button>
+  {/if}
   <h2 class="upload-title">New post</h2>
 
-  {#if status === 'done' && result}
-    <div class="result">
-      <p class="result-label">Original vs generated</p>
-      <ImageCompare beforeUrl={result.original_url} afterUrl={result.generated_url} />
-      <button class="btn-secondary" onclick={reset}>Upload another</button>
-    </div>
-  {:else}
+
     <!-- Drop zone -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
@@ -148,12 +145,25 @@
         {/if}
       </button>
     </div>
-  {/if}
+
 </div>
 
 <style>
+  .back-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s;
+    align-self: flex-start;
+  }
+
+  .back-btn:hover { color: var(--text); }
+
   .upload-card {
-    max-width: 560px;
+    max-width: 600px;
     margin: 24px auto 0;
     padding: 20px;
     background: var(--surface);

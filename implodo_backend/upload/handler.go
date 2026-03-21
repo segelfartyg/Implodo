@@ -122,7 +122,7 @@ func (h *Handler) GetImage(c *gin.Context) {
 //
 //	POST /api/upload
 //
-// Accepts a multipart/form-data request with an "image" field.
+// Accepts a multipart/form-data request with an +"image" field.
 //  1. Reads and validates the image.
 //  2. Sends it to Nano Banana to generate a second image.
 //  3. Uploads both images to blob storage.

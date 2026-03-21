@@ -212,6 +212,17 @@ func (h *Handler) Me(c *gin.Context) {
 	})
 }
 
+// Profile godoc
+//
+//	GET /api/profile  (protected)
+//
+// Returns the authenticated user's profile, including their bio description.
+func (h *Handler) Profile(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"bio": "I am a lizard making lizard things",
+	})
+}
+
 // --- Helpers ---
 
 func (h *Handler) fetchGoogleUserInfo(token *oauth2.Token) (*googleUserInfo, error) {

@@ -56,6 +56,7 @@ func main() {
 	api.Use(auth.JWTMiddleware(cfg))
 	{
 		api.GET("/me", authHandler.Me)
+		api.GET("/profile", authHandler.Profile)
 		api.POST("/upload", uploadHandler.UploadImage)
 		api.GET("/images", uploadHandler.ListImages)
 	}

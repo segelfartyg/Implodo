@@ -31,10 +31,13 @@ func NewGeminiClient(ctx context.Context) (*GeminiClient, error) {
 
 // Generate sends imageData to Gemini and returns the generated image bytes.
 func (g *GeminiClient) Generate(ctx context.Context, imageData []byte, mimeType string) ([]byte, error) {
+
+	userDescription := "I am a lizard making lizard things"
+
 	contents := []*genai.Content{
 		genai.NewContentFromParts(
 			[]*genai.Part{
-				genai.NewPartFromText("Generate a new, stylistically similar version of this image."),
+				genai.NewPartFromText("Generate a new similar version of this image. It is very important that the image stays the same. Add elements and modify the image to give room for this description: " + userDescription + ". The image is used for making two parallell images that you can toggle between by a slider. Therefore you cant change the picture that much. But try to follow the description of this user."),
 				{InlineData: &genai.Blob{MIMEType: mimeType, Data: imageData}},
 			},
 			genai.RoleUser,

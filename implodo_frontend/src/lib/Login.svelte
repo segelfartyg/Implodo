@@ -20,10 +20,10 @@
 </script>
 
 <div class="login-page">
-  <h1 class="wordmark">Implodo</h1>
-  <p class="tagline">Sign in to continue</p>
+  <h1 class="wordmark animate-up" style="animation-delay: 0ms">Splodo</h1>
+  <p class="tagline animate-up" style="animation-delay: 100ms">Sign in to continue</p>
 
-  <button class="login-btn" onclick={handleLogin} disabled={loading}>
+  <button class="login-btn animate-up" style="animation-delay: 220ms" onclick={handleLogin} disabled={loading}>
     {#if loading}
       Redirecting…
     {:else}
@@ -61,47 +61,54 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 16px;
-    background: var(--bg);
+    gap: 20px;
     color: var(--text);
+    /* centered glow behind the wordmark */
+    background-image: radial-gradient(ellipse 60% 40% at 50% 42%, rgba(224, 48, 48, 0.12), transparent 70%);
   }
 
   .wordmark {
-    font-size: 2rem;
+    font-size: 3.5rem;
     font-weight: 800;
-    letter-spacing: -1px;
+    letter-spacing: 0.02em;
     margin: 0;
+    text-shadow:
+      0 0 40px var(--accent-glow),
+      0 0 80px rgba(224, 48, 48, 0.12);
   }
 
   .tagline {
-    margin: 0;
-    color: var(--muted);
-    font-size: 0.95rem;
+    margin: -8px 0 0;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
 
   .login-btn {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-top: 8px;
-    padding: 10px 20px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
+    margin-top: 12px;
+    padding: 11px 22px;
+    border-radius: 10px;
+    border: 1px solid var(--border-hover);
     background: var(--surface-raised);
     color: var(--text);
     font-size: 0.95rem;
-    font-weight: 500;
     cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    box-shadow: var(--shadow-sm);
   }
 
   .login-btn:hover:not(:disabled) {
-    border-color: var(--border-hover);
+    border-color: var(--accent);
     background: var(--surface);
+    box-shadow: 0 0 20px var(--accent-glow);
   }
 
   .login-btn:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
   }
 
@@ -112,8 +119,30 @@
   }
 
   .error {
-    color: var(--like);
+    color: var(--like-color);
     font-size: 0.875rem;
     margin: 0;
+  }
+
+  /* ── Entrance animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-up {
+    opacity: 0;
+    animation: fadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Subtle wordmark glow pulse */
+  @keyframes glowPulse {
+    0%, 100% { text-shadow: 0 0 40px var(--accent-glow), 0 0 80px rgba(224, 48, 48, 0.12); }
+    50%       { text-shadow: 0 0 60px rgba(224, 48, 48, 0.45), 0 0 120px rgba(224, 48, 48, 0.2); }
+  }
+
+  .wordmark {
+    animation: fadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+               glowPulse 4s ease-in-out 0.6s infinite;
   }
 </style>

@@ -1,20 +1,32 @@
-/* ─── Design tokens (dark theme) ─────────────────────────────────────── */
+.supermercado-one-regular {
+  font-family: "Supermercado One", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* ─── Design tokens ───────────────────────────────────────────────────── */
 :root {
-  --bg:             #0a0a0a;
-  --surface:        #111111;
-  --surface-raised: #1a1a1a;
-  --topbar-bg:      rgba(10, 10, 10, 0.85);
+  --bg:             #080808;
+  --surface:        #0f0f0f;
+  --surface-raised: #161616;
+  --topbar-bg:      rgba(8, 8, 8, 0.88);
 
-  --border:         #222222;
-  --border-hover:   #333333;
+  --border:         #1c1c1c;
+  --border-hover:   #2a2a2a;
 
-  --text:           #e8e8e8;
-  --text-muted:     #777777;
+  --text:           #f0f0f0;
+  --text-muted:     #606060;
+  --muted:          #606060;
 
-  --accent:         #7c5cfc;
-  --like-color:     #e0415a;
+  --accent:         #e03030;
+  --accent-dim:     rgba(224, 48, 48, 0.12);
+  --accent-glow:    rgba(224, 48, 48, 0.25);
+  --like-color:     #ff4560;
 
-  --skeleton-base:  #1e1e1e;
+  --skeleton-base:  #161616;
+
+  --shadow-sm:  0 1px 6px rgba(0, 0, 0, 0.5);
+  --shadow-md:  0 4px 24px rgba(0, 0, 0, 0.7);
 
   color-scheme: dark;
   -webkit-font-smoothing: antialiased;
@@ -29,14 +41,19 @@
 }
 
 html {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   font-size: 16px;
+  font-family: "Supermercado One", sans-serif;
+  font-weight: 400;
+  font-style: normal;
 }
 
 body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+  /* subtle radial ambient */
+  background-image: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(224, 48, 48, 0.06), transparent);
+  background-attachment: fixed;
 }
 
 img {
@@ -47,6 +64,29 @@ img {
 button {
   font-family: inherit;
   font-size: inherit;
+}
+
+/* ─── Shared button classes ───────────────────────────────────────────── */
+.btn-primary {
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0 0 0 var(--accent-glow);
+}
+
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.88;
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 #app {

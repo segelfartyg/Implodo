@@ -46,7 +46,8 @@ export function clearToken() {
 function parseTokenPayload(token) {
   try {
     const [, payload] = token.split('.');
-    return JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+    const bytes = Uint8Array.from(atob(payload.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
+    return JSON.parse(new TextDecoder().decode(bytes));
   } catch {
     return null;
   }

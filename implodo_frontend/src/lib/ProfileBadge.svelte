@@ -3,6 +3,7 @@
   // For now it accepts props with sensible defaults.
   export let username = 'You';
   export let avatarUrl = null;
+  export let onclick = null;
 
   $: initials = username
     .split(/[\s._-]+/)
@@ -11,7 +12,7 @@
     .join('');
 </script>
 
-<div class="profile-badge" title={username}>
+<div class="profile-badge" title={username} role="button" tabindex="0" onclick={onclick} onkeydown={e => e.key === 'Enter' && onclick?.()}>
   {#if avatarUrl}
     <img class="avatar" src={avatarUrl} alt={username} />
   {:else}

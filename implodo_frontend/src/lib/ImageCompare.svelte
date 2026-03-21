@@ -1,8 +1,11 @@
 <script>
   export let beforeUrl; // revealed on the right as you drag left
   export let afterUrl;  // visible by default on the left
+  export let showAfter = false;
 
-  let position = 50; // divider % from left
+  let position = 0; // divider % from left
+
+  $: position = showAfter ? 100 : 0;
   let dragging = false;
   let container;
 
@@ -103,7 +106,7 @@
     transform: translate(-50%, -50%);
     width: 38px;
     height: 38px;
-    background: #fff;
+    background: #ffffff;
     border-radius: 50%;
     display: flex;
     align-items: center;
